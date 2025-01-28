@@ -57,26 +57,30 @@ app.post('/api/users', async (req, res) => {
 app.post('/api/users/:_id/exercises', async (req, res) => {
   const { _id } = req.params;
   const { description, duration, date } = req.body;
+
   if (!description || !duration) {
     return res.status(400).json({ error: 'Description and duration are required.' });
   }
+
   const exerciseDate = date ? new Date(date) : new Date();
+
   try {
     const newExercise = new Exercise({
       userId: _id,
       description,
-      duration,
+      duration: parseInt(duration),
       date: exerciseDate,
     });
 
   await newExercise.save();
 
   const user = await User.findById(_id);
+
     res.json({
       username: user.username,
       description,
-      duration,
-      date: exerciseDate.toISOString(),
+      duration: parseInt(duration),
+      date: exerciseDate.toDateString(),
       _id: user._id,
     });
   } catch (err) {
@@ -132,7 +136,7 @@ app.get('/api/users/:_id/logs', async (req, res) => {
   }
 
   res.json({
-    username: user.username, // Include the username in the response
+    username: user.username, 
     count: count,
     _id: _id,
     log: exercises,
